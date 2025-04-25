@@ -2,156 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Polis Clicker - Ancient Greece</title>
+  <title>Polis Clicker - Full Game</title>
 </head>
 <body>
-  <h1>🏛 Polis Clicker: Ancient Greece</h1>
-  <div>
-    <button onclick="triggerStoryMission()">📜 Story Mission</button>
-    <button onclick="launchDodgeMiniGame()">⚔️ Invasion Defense</button>
-    <button onclick="tributeTemple()">🙏 Temple Tribute</button>
-  </div>
-  <canvas id="battleCanvas" width="400" height="300" style="border:1px solid #ccc; display:none;"></canvas>
+  <h1>🏛 Polis Clicker - Ancient Greece Game</h1>
+  <canvas id="battleCanvas" width="400" height="300" style="border:1px solid #ccc;"></canvas>
+  <div id="warModal"><h2 id="battleResult"></h2></div>
   <div id="storyModal" style="display:none;">
-    <h2 id="storyTitle">Story</h2>
-    <p id="storyText">Text</p>
-    <button onclick="completeStory(true)">✅ Wise</button>
-    <button onclick="completeStory(false)">❌ Hasty</button>
-  </div>
-  <div id="warModal" style="display:none;">
-    <h3 id="battleResult">Result here</h3>
+    <h2 id="storyTitle"></h2>
+    <p id="storyText"></p>
+    <button onclick="completeStory(true)">✅ Wise Choice</button>
+    <button onclick="completeStory(false)">❌ Hasty Choice</button>
   </div>
   <script>
-    let favor = 0, warScore = 0, citizens = 10, dead = 0, soldiers = 5;
-    let totalFavorEarned = 0, totalBattlesFought = 0, totalMissionsCompleted = 0;
-
-    function speakText(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      speechSynthesis.speak(utterance);
-    }
-
-    function updateStatsDisplay() {
-      let stats = document.getElementById('statsBox');
-      if (!stats) {
-        stats = document.createElement('div');
-        stats.id = 'statsBox';
-        stats.innerHTML = `<h3>📊 Advanced Stats</h3>
-          <p>Total Favor Earned: <span id="statFavor">0</span></p>
-          <p>Story Missions Completed: <span id="statMissions">0</span></p>
-          <p>Invasions Fought: <span id="statBattles">0</span></p>`;
-        document.body.appendChild(stats);
-      }
-      document.getElementById('statFavor').textContent = totalFavorEarned;
-      document.getElementById('statMissions').textContent = totalMissionsCompleted;
-      document.getElementById('statBattles').textContent = totalBattlesFought;
-    }
-
-    function triggerStoryMission() {
-      const missions = [
-        {
-          title: "🏛 The Oracle of Delphi",
-          text: "You are asked whether to follow the oracle’s advice or lead your own path.",
-          wiseOutcome: { favor: 10, warScore: 5, alert: "🌟 The gods are pleased. +10 Favor, +5 War Score" },
-          hastyOutcome: { favor: -5, dead: 3, alert: "⚡ The gods are angered. -5 Favor, 3 citizens lost" }
-        },
-        {
-          title: "⚔️ The Battle of Marathon",
-          text: "The Persians are landing. Do you rally the army or wait for reinforcements?",
-          wiseOutcome: { warScore: 15, soldiers: -2, alert: "🏅 You rallied just in time. +15 War Score, -2 Soldiers" },
-          hastyOutcome: { citizens: -4, alert: "💀 Caught off guard. -4 Citizens" }
-        },
-        {
-          title: "🦠 The Athenian Plague",
-          text: "You can enforce isolation or continue city gatherings. What do you choose?",
-          wiseOutcome: { favor: 5, citizens: -1, alert: "🩺 Some loss, but the gods approve. +5 Favor, -1 Citizen" },
-          hastyOutcome: { dead: 6, favor: -10, alert: "☠️ Outbreak worsens. -10 Favor, 6 citizens lost" }
-        },
-        {
-          title: "🏛 Rise of Democracy",
-          text: "Do you grant the people power or tighten control?",
-          wiseOutcome: { favor: 8, warScore: 10, alert: "📜 Democracy prevails! +8 Favor, +10 War Score" },
-          hastyOutcome: { favor: -5, alert: "🔒 Tyranny stirs unrest. -5 Favor" }
-        }
-      ];
-
-      const mission = missions[Math.floor(Math.random() * missions.length)];
-      document.getElementById('storyModal').style.display = 'block';
-      document.getElementById('storyTitle').textContent = mission.title;
-      document.getElementById('storyText').textContent = mission.text;
-      speakText(mission.text);
-      document.getElementById('storyModal').dataset.mission = JSON.stringify(mission);
-    }
-
-    function completeStory(wise) {
-      const missionData = JSON.parse(document.getElementById('storyModal').dataset.mission);
-      document.getElementById('storyModal').style.display = 'none';
-      totalMissionsCompleted++;
-      const outcome = wise ? missionData.wiseOutcome : missionData.hastyOutcome;
-      if (outcome.favor) { favor += outcome.favor; if (wise) totalFavorEarned += outcome.favor; }
-      if (outcome.warScore) warScore += outcome.warScore;
-      if (outcome.dead) { dead += outcome.dead; citizens = Math.max(0, citizens - outcome.dead); }
-      if (outcome.citizens) citizens = Math.max(0, citizens - Math.abs(outcome.citizens));
-      if (outcome.soldiers) soldiers = Math.max(0, soldiers + outcome.soldiers);
-      alert(outcome.alert);
-      updateStatsDisplay();
-    }
-
-    function tributeTemple() {
-      if (favor >= 10) {
-        favor -= 10;
-        warScore += 15;
-        totalFavorEarned += 10;
-        alert("🛕 Tribute accepted. Divine favor grants +15 War Score");
-      } else {
-        alert("Not enough favor to offer a tribute.");
-      }
-      updateStatsDisplay();
-    }
-
-    function launchDodgeMiniGame() {
-      const canvas = document.getElementById('battleCanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.style.display = 'block';
-      document.getElementById('warModal').style.display = 'block';
-      let playerX = 180;
-      const playerSize = 20;
-      let spears = [];
-      let gameTicks = 0;
-      let survived = true;
-      totalBattlesFought++;
-
-      document.onkeydown = (e) => {
-        if (e.key === 'ArrowLeft') playerX = Math.max(0, playerX - 20);
-        if (e.key === 'ArrowRight') playerX = Math.min(400 - playerSize, playerX + 20);
-      };
-
-      const interval = setInterval(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'yellow';
-        ctx.fillRect(playerX, 280, playerSize, playerSize);
-
-        if (Math.random() < 0.2) spears.push({ x: Math.random() * 380, y: 0 });
-        ctx.fillStyle = 'red';
-        spears.forEach(spear => {
-          spear.y += 5;
-          ctx.fillRect(spear.x, spear.y, 10, 20);
-          if (spear.y > 280 && spear.x >= playerX && spear.x < playerX + playerSize) survived = false;
-        });
-
-        gameTicks++;
-        if (gameTicks >= 100) {
-          clearInterval(interval);
-          document.getElementById('battleResult').textContent = survived ? "🏅 Dodged all spears! +10 War Score" : "💀 Hit! -5 citizens";
-          if (survived) warScore += 10;
-          else { citizens = Math.max(0, citizens - 5); dead += 5; }
-          updateStatsDisplay();
-        }
-      }, 50);
-    }
-
-    window.onload = updateStatsDisplay;
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Error</title></head>
+<body><h1>Error loading full game. Please try regenerating.</h1></body>
+</html>
   </script>
 </body>
 </html>
