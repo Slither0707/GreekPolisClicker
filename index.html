@@ -1,14 +1,104 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Polis Clicker - Phase 3</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polis Clicker: Legendary Heroes Edition</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    #stats {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    .tribute {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
 </head>
 <body>
-  <h1>Polis Clicker - Pixel Spartan Edition</h1>
-  <canvas id="battleCanvas" width="400" height="300"></canvas>
-  <div id="warModal"><h3 id="battleResult"></h3></div>
-  <script src="main.js"></script>
+
+  <h1>Polis Clicker: Legendary Heroes Edition</h1>
+
+  <button onclick="gatherFood()">Gather Food</button>
+  <button onclick="gatherWood()">Gather Wood</button>
+  <button onclick="gatherStone()">Gather Stone</button>
+
+  <div id="stats">
+    <p><strong>Food:</strong> <span id="food">0</span></p>
+    <p><strong>Wood:</strong> <span id="wood">0</span></p>
+    <p><strong>Stone:</strong> <span id="stone">0</span></p>
+    <p><strong>Population:</strong> <span id="population">5</span></p>
+  </div>
+
+  <div class="tribute">
+    <h2>Tribute to a God</h2>
+    <button onclick="chooseGod('Zeus')">Zeus (+100 Wood, -10 Population)</button>
+    <button onclick="chooseGod('Athena')">Athena (+10% Food Production)</button>
+    <button onclick="chooseGod('Poseidon')">Poseidon (Faster Building)</button>
+    <p id="chosenGod"></p>
+  </div>
+
+  <script>
+    let food = 0;
+    let wood = 0;
+    let stone = 0;
+    let population = 5;
+    let foodMultiplier = 1;
+    let buildingSpeed = 1;
+
+    function gatherFood() {
+      food += 1 * foodMultiplier;
+      updateStats();
+    }
+
+    function gatherWood() {
+      wood += 1;
+      updateStats();
+    }
+
+    function gatherStone() {
+      stone += 1;
+      updateStats();
+    }
+
+    function chooseGod(god) {
+      if (god === 'Zeus') {
+        wood += 100;
+        population -= 10;
+        document.getElementById('chosenGod').innerText = "You pledged allegiance to Zeus.";
+      } else if (god === 'Athena') {
+        foodMultiplier = 1.1;
+        document.getElementById('chosenGod').innerText = "You pledged allegiance to Athena.";
+      } else if (god === 'Poseidon') {
+        buildingSpeed = 1.5;
+        document.getElementById('chosenGod').innerText = "You pledged allegiance to Poseidon.";
+      }
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('food').innerText = Math.floor(food);
+      document.getElementById('wood').innerText = wood;
+      document.getElementById('stone').innerText = stone;
+      document.getElementById('population').innerText = population;
+    }
+  </script>
+
 </body>
 </html>
